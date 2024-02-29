@@ -1,0 +1,65 @@
+estudiantes:
+  spec:
+    replicaCount: 1
+    minReplicaCount: 1
+    maxReplicaCount: 3
+    averageUtilization: 60
+    initialDelaySeconds: 35
+    periodSeconds: 5
+    cpuRequest: "100m"
+    memoryRequest: "500Mi"
+
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+
+  ingress:
+    class: nginx
+
+  image:
+    repository: ed2723/estudiantes
+    tag: "latest"
+
+  database:
+    host: mysql-service
+    port: 3306
+    name: mydatabase
+    user: myuser
+    password: my-secret-pw
+
+mysql:
+  spec:
+    replicaCount: 1
+    storage:
+  
+  pv:
+    spec:
+      storage: 1Gi
+      key: kubernetes.io/hostname
+      values: pool-0kk57mty7-or88q
+
+  pvc:
+    spec:
+      storage: 10Gi
+      storageClassName: do-block-storage
+
+  database:
+    port: 3306
+    password: my-secret-pw
+  
+  image:
+    repository: mysql
+    tag: "latest"
+
+prometheus:
+  spec:
+    ports:
+      name: http-web
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      instance: prometheus
+      name: grafana
+    type: LoadBalancer

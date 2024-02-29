@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-estudiantes-service
+spec:
+  type: {{ .Values.estudiantes.service.type }}
+  ports:
+  - port: {{ .Values.estudiantes.service.port }}
+    targetPort: {{ .Values.estudiantes.service.targetPort }}
+  selector:
+    app: estudiantes

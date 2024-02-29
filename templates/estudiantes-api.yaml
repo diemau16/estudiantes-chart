@@ -1,0 +1,46 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: estudiantes
+  name: {{ .Release.Name }}-estudiantes
+spec:
+  replicas: {{ .Values.estudiantes.spec.replicaCount }}
+  selector:
+    matchLabels:
+      app: estudiantes
+  template:
+    metadata:
+      labels:
+        app: estudiantes
+    spec:
+      containers:
+      - image: "{{ .Values.estudiantes.image.repository }}:{{ .Values.estudiantes.image.tag }}"
+        name: estudiantes
+        ports:
+        - containerPort: 8080
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: {{ .Values.estudiantes.spec.initialDelaySeconds }}
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          periodSeconds: {{ .Values.estudiantes.spec.periodSeconds }}
+        resources:
+          requests:
+            cpu: {{ .Values.estudiantes.spec.cpuRequest }}
+            memory: {{ .Values.estudiantes.spec.memoryRequest }}
+        env:
+        - name: DATABASE_HOST
+          value: {{ .Values.estudiantes.database.host }}
+        - name: DATABASE_PORT
+          value: {{ .Values.estudiantes.database.port }}
+        - name: DATABASE_NAME
+          value: {{ .Values.estudiantes.database.name }}
+        - name: DATABASE_USER
+          value: {{ .Values.estudiantes.database.user }}
+        - name: DATABASE_PASSWORD
+          value: {{ .Values.estudiantes.database.password }}
